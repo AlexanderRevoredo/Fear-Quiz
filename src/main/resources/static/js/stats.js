@@ -43,6 +43,13 @@
     entries.forEach((entry) => {
       const row = document.createElement("div");
       row.className = "bar-row";
+      /* A barra é decoração; o valor precisa chegar ao leitor de tela. */
+      const percentLabel = total > 0 ? Math.round((entry.value / total) * 100) : 0;
+      row.setAttribute("role", "img");
+      row.setAttribute(
+        "aria-label",
+        `${entry.label}: ${entry.value} de ${total} (${percentLabel}%)`
+      );
 
       const label = document.createElement("span");
       label.className = "bar-label";

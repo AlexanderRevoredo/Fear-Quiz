@@ -14,6 +14,10 @@
   <div id="presence" title=""></div>
   <div id="secret"></div>
 
+  <!-- Região viva: recebe cada frase inteira depois de digitada, para leitor
+       de tela anunciar de uma vez em vez de letra a letra. -->
+  <p id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+
   <div id="audio-mini" hidden>
     <button id="mini-mute" type="button" title="Silenciar">♪</button>
     <input id="mini-volume" type="range" min="0" max="100" value="70" title="Volume" />

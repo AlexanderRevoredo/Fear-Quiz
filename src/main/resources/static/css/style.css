@@ -22,6 +22,59 @@
  */
 [hidden] { display: none !important; }
 
+/* Indicador de foco visível em tudo que é operável por teclado. Sem isto,
+   quem navega por Tab não enxerga onde está. */
+:focus-visible {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: 3px;
+}
+
+/*
+ * Movimento reduzido: respeita quem configurou o sistema para evitar animação
+ * (desconforto vestibular). A experiência continua inteira — o texto, o áudio,
+ * os sustos e as aparições permanecem. O que sai é só o DESLOCAMENTO: quedas,
+ * travessias, tremores, rotação e escala. As aparições passam a simplesmente
+ * surgir no lugar, em vez de se moverem até ele.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Estes existem só pelo movimento: viram aparição estática. */
+  .spider {
+    animation: none !important;
+    transform: translateY(var(--drop)) !important;
+    opacity: 0.7;
+  }
+
+  .snake {
+    animation: none !important;
+    left: 35vw;
+    opacity: 0.5;
+  }
+
+  .tear,
+  .spider .thread { display: none !important; }
+
+  body.vertigo #app,
+  body.closing-in #app,
+  #paper.corrupt-5,
+  .shake,
+  .glitch {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* A vinheta fechando é opacidade, não deslocamento: pode ficar. */
+  body.closing-in #vignette {
+    animation: none !important;
+    background: radial-gradient(ellipse at center, transparent 8%, rgba(0,0,0,0.97) 65%);
+  }
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -247,6 +300,16 @@ body {
   cursor: default;
 }
 
+/* Confirma qual opção foi clicada durante a pausa até a próxima pergunta.
+   Sem isto o clique some sem retorno e dá vontade de clicar de novo. */
+.option.chosen {
+  border-color: var(--accent-glow);
+  color: #fff;
+  background: rgba(138, 31, 31, 0.16);
+}
+
+.option.chosen:disabled { opacity: 1; }
+
 .text-row {
   display: flex;
   gap: 0.8em;
@@ -267,7 +330,6 @@ body {
 }
 
 .text-input:focus {
-  outline: none;
   border-color: var(--accent-glow);
 }
 
@@ -587,7 +649,6 @@ body.dread-10 #question-text {
 }
 
 .feedback-message:focus {
-  outline: none;
   border-color: var(--accent-glow);
 }
 
@@ -708,7 +769,6 @@ body.dread-10 #question-text {
   width: 180px;
   height: 2px;
   background: var(--border);
-  outline: none;
   cursor: pointer;
 }
 
@@ -777,7 +837,6 @@ body.dread-10 #question-text {
   width: 70px;
   height: 2px;
   background: var(--border);
-  outline: none;
   cursor: pointer;
 }
 

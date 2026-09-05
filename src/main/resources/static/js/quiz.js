@@ -23,6 +23,7 @@
   const btnContinueEnd = document.getElementById("btn-continue-end");
   const watchTextEl = document.getElementById("watch-text");
   const btnMenu = document.getElementById("btn-menu");
+  const announcerEl = document.getElementById("announcer");
   const feedbackForm = document.getElementById("feedback");
   const feedbackMessageEl = document.getElementById("feedback-message");
   const feedbackStateEl = document.getElementById("feedback-state");
@@ -126,7 +127,14 @@
 
   function showScreen(name) {
     Object.values(screens).forEach((s) => s.classList.remove("active"));
-    screens[name].classList.add("active");
+    const screen = screens[name];
+    screen.classList.add("active");
+
+    /* Sem mover o foco, quem navega por teclado continua preso na tela
+       anterior, que agora está escondida. */
+    const alvo = screen.querySelector(".title, .watch-text, #question-text") || screen;
+    alvo.setAttribute("tabindex", "-1");
+    alvo.focus({ preventScroll: true });
   }
 
   function buildProgressDots() {
@@ -156,18 +164,53 @@
     Effects.setPresenceActivity(level);
   }
 
+  const semMovimento = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  /* Leitor de tela não acompanha texto que aparece letra a letra: anunciar a
+     cada caractere seria ruído. A frase inteira vai para a região viva só
+     quando termina de ser digitada. */
+  function announce(text) {
+    if (announcerEl) announcerEl.textContent = text;
+  }
+
   function typeText(el, text, speed = 16, token = state.renderToken) {
     return new Promise((resolve) => {
+      /* Digitação é animação: com movimento reduzido, o texto vem inteiro. */
+      if (semMovimento.matches) {
+        el.textContent = text;
+        announce(text);
+        resolve();
+        return;
+      }
+
       el.textContent = "";
       const cursor = document.createElement("span");
       cursor.className = "cursor";
       cursor.textContent = "▍";
       let i = 0;
 
+      state.typing = true;
+      state.skipTyping = false;
+      state.typingStartedAt = Date.now();
+
+      function terminar() {
+        state.typing = false;
+        cursor.remove();
+        announce(text);
+        resolve();
+      }
+
       function step() {
         if (token !== state.renderToken) {
+          state.typing = false;
           cursor.remove();
           resolve();
+          return;
+        }
+        /* Quem já leu (ou está rejogando) não deve esperar a máquina. */
+        if (state.skipTyping) {
+          el.textContent = text;
+          terminar();
           return;
         }
         if (i <= text.length) {
@@ -176,8 +219,7 @@
           i++;
           setTimeout(step, speed);
         } else {
-          cursor.remove();
-          resolve();
+          terminar();
         }
       }
       step();
@@ -248,7 +290,12 @@
   const FEAR_PAYLOADS = {
     aranhas: () => Effects.spiders(),
     cobras: () => Effects.snake(),
-    altura: () => Effects.vertigo(),
+    /* Som junto porque com movimento reduzido a queda não acontece e o
+       momento ficaria vazio. */
+    altura: () => {
+      Effects.vertigo();
+      Sound.distant(0);
+    },
     palhacos: () => Effects.clown(),
     fechado: () => Effects.closeIn(),
     escuro: () => {
@@ -386,7 +433,10 @@
       btn.className = "option";
       btn.type = "button";
       btn.textContent = opt.label;
-      btn.addEventListener("click", () => handleAnswer(question, opt, buttons));
+      btn.addEventListener("click", () => {
+        btn.classList.add("chosen");
+        handleAnswer(question, opt, buttons);
+      });
       optionsEl.appendChild(btn);
       return btn;
     });
@@ -404,6 +454,9 @@
     input.maxLength = 24;
     input.autocomplete = "off";
     input.placeholder = question.placeholder || "";
+    /* Placeholder não é rótulo: some ao digitar e leitor de tela ignora.
+       A própria pergunta serve de rótulo acessível. */
+    input.setAttribute("aria-labelledby", "question-text");
 
     const btn = document.createElement("button");
     btn.className = "btn";
@@ -784,6 +837,26 @@
       Prologue.play(() => showScreen("intro"));
     }, { once: true });
   }
+
+  /*
+   * Clique ou tecla durante a digitação adianta a frase inteira.
+   *
+   * A carência de 150ms existe porque o clique que responde uma pergunta
+   * continua borbulhando até o document DEPOIS que a próxima já começou a ser
+   * digitada — sem ela, cada resposta pularia o texto seguinte e o efeito de
+   * máquina de escrever nunca apareceria.
+   */
+  const CARENCIA_PULO = 150;
+
+  function skipTyping() {
+    if (!state.typing) return;
+    if (Date.now() - state.typingStartedAt < CARENCIA_PULO) return;
+    state.skipTyping = true;
+  }
+  document.addEventListener("click", skipTyping);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " " || e.key === "Escape") skipTyping();
+  });
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
