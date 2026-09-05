@@ -18,12 +18,17 @@ COPY src ./src
 RUN mvn -B clean package -DskipTests
 
 # ---------- runtime ----------
-# JRE em vez de JDK: imagem final bem menor.
-FROM eclipse-temurin:21-jre-alpine
+# JRE em vez de JDK: imagem final menor.
+#
+# Imagem baseada em glibc (jammy), NAO alpine. O resolvedor DNS do musl, usado
+# pelo Alpine, falha em alguns hosts que respondem com varios enderecos -- e o
+# pooler do Supabase responde com tres. E uma causa classica de "conecta na
+# minha maquina e nao conecta no container".
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
 # Rodar como usuario comum, nao root.
-RUN addgroup -S app && adduser -S app -G app
+RUN groupadd --system app && useradd --system --gid app app
 
 COPY --from=build --chown=app:app /build/target/*.jar app.jar
 
