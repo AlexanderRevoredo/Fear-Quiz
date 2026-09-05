@@ -4,10 +4,14 @@
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /build
 
-# Dependencias em camada propria: so refaz o download quando o pom muda,
-# o que deixa os deploys seguintes bem mais rapidos.
+# Dependencias em camada propria: so refaz o download quando o pom muda, o que
+# deixa os deploys seguintes bem mais rapidos.
+# O "|| true" e proposital: isto e so aquecimento de cache, nao um passo de
+# correcao. O go-offline as vezes falha ao resolver alguma dependencia de
+# plugin, e nesse caso o "package" abaixo baixa o que faltou. Sem a guarda,
+# uma falha aqui derrubaria o deploy inteiro por um passo que e opcional.
 COPY pom.xml .
-RUN mvn -B dependency:go-offline
+RUN mvn -B dependency:go-offline || true
 
 COPY src ./src
 # Os testes rodam no desenvolvimento (./mvnw test); aqui so empacota.
