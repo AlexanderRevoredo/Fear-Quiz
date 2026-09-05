@@ -182,10 +182,28 @@
     <section id="screen-watch" class="screen">
       <p id="watch-text" class="watch-text"></p>
       <p id="watch-score" class="watch-score"></p>
-      <div id="watch-actions" class="watch-actions" hidden>
-        <button id="btn-menu" class="btn">Voltar ao início</button>
-        <a id="btn-feedback" class="btn" href="#" target="_blank" rel="noopener noreferrer" hidden>Deixar feedback</a>
-      </div>
+      <form id="feedback" class="feedback" hidden>
+        <p id="feedback-title" class="feedback-title"></p>
+
+        <fieldset class="stars">
+          <legend class="sr-only">Nota de 1 a 5 estrelas</legend>
+          <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 estrelas">★</label>
+          <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 estrelas">★</label>
+          <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 estrelas">★</label>
+          <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 estrelas">★</label>
+          <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 estrela">★</label>
+        </fieldset>
+
+        <textarea id="feedback-message" class="feedback-message" maxlength="500"
+                  rows="3" placeholder="quer dizer mais alguma coisa? (opcional)"></textarea>
+
+        <p id="feedback-state" class="feedback-state" role="status"></p>
+
+        <div class="watch-actions">
+          <button id="btn-send-feedback" class="btn" type="submit">Enviar</button>
+          <button id="btn-menu" class="btn" type="button">Voltar ao início</button>
+        </div>
+      </form>
       <p class="credit"><a id="watch-credit" href="#" target="_blank" rel="noopener noreferrer" hidden></a></p>
     </section>
 

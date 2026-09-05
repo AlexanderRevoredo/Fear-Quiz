@@ -20,6 +20,19 @@ const Effects = (() => {
 
   function drawGrain() {
     const w = canvas.width, h = canvas.height;
+
+    /* Aba em segundo plano ou tela em rotação podem reportar tamanho zero, e
+       createImageData(0,0) lanca excecao. Sem esta guarda a excecao subia e
+       matava o resto da inicializacao, deixando a pagina sem nenhum botao
+       funcionando. */
+    if (w < 1 || h < 1) {
+      setTimeout(() => {
+        resizeGrain();
+        drawGrain();
+      }, 250);
+      return;
+    }
+
     const imageData = ctx.createImageData(w, h);
     const buffer = new Uint32Array(imageData.data.buffer);
     for (let i = 0; i < buffer.length; i++) {

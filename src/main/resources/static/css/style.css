@@ -14,6 +14,14 @@
 
 * { box-sizing: border-box; }
 
+/*
+ * O atributo `hidden` vale como `display: none` na folha do navegador, e por
+ * isso perde para qualquer `display` declarado aqui (flex, inline-block...).
+ * Esta regra faz `hidden` significar escondido em qualquer elemento, sem
+ * precisar lembrar de escrever `[hidden]` em cada seletor.
+ */
+[hidden] { display: none !important; }
+
 html, body {
   margin: 0;
   padding: 0;
@@ -502,14 +510,104 @@ body.dread-10 #question-text {
   min-height: 1.2em;
 }
 
+/* ---------- feedback ---------- */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.feedback-title {
+  color: var(--fg);
+  font-size: 1rem;
+  margin: 0 0 1.2em;
+}
+
+/*
+ * Radios de verdade por baixo das estrelas: funciona com teclado e com leitor
+ * de tela sem JavaScript extra. A ordem no HTML é 5→1 para o seletor `~`
+ * conseguir pintar as estrelas anteriores no hover/seleção.
+ */
+.stars {
+  border: none;
+  margin: 0 0 1.4em;
+  padding: 0;
+  display: inline-flex;
+  flex-direction: row-reverse;
+  gap: 0.25em;
+}
+
+.stars input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.stars label {
+  font-size: 1.9rem;
+  line-height: 1;
+  color: var(--border);
+  cursor: pointer;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.stars input:checked ~ label,
+.stars label:hover,
+.stars label:hover ~ label {
+  color: var(--accent-glow);
+}
+
+.stars input:focus-visible + label {
+  outline: 1px solid var(--accent-glow);
+  outline-offset: 3px;
+}
+
+.feedback-message {
+  display: block;
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  padding: 0.9em 1em;
+  resize: vertical;
+  margin-bottom: 1.2em;
+  box-sizing: border-box;
+  transition: border-color 250ms ease;
+}
+
+.feedback-message:focus {
+  outline: none;
+  border-color: var(--accent-glow);
+}
+
+.feedback-message::placeholder {
+  color: var(--fg-faint);
+}
+
+.feedback-state {
+  color: var(--fg-dim);
+  font-size: 0.82rem;
+  min-height: 1.2em;
+  margin: 0 0 1.4em;
+}
+
 .watch-actions {
   display: flex;
   gap: 1em;
   justify-content: center;
   flex-wrap: wrap;
 }
-
-.watch-actions[hidden] { display: none; }
 
 /* o <a> de feedback precisa parecer botão como o irmão dele */
 .watch-actions .btn {
@@ -656,10 +754,6 @@ body.dread-10 #question-text {
   #audio-mini {
     opacity: 0.65;
   }
-}
-
-#audio-mini[hidden] {
-  display: none;
 }
 
 #mini-mute {
@@ -923,8 +1017,6 @@ body.vertigo #app {
     border-color: var(--accent);
   }
 }
-
-.credit a[hidden] { display: none; }
 
 /* ---------- tela de estatísticas ---------- */
 

@@ -377,11 +377,3 @@ const PORTFOLIO = {
   label: "portfólio do desenvolvedor",
 };
 
-/*
- * Botão de feedback da tela final. Se `url` ficar vazio, cai no portfólio —
- * troque pela página do projeto assim que ela existir.
- */
-const FEEDBACK = {
-  url: "",
-  label: "Deixar feedback",
-};

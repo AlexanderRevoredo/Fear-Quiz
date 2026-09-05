@@ -23,6 +23,10 @@
   const btnContinueEnd = document.getElementById("btn-continue-end");
   const watchTextEl = document.getElementById("watch-text");
   const btnMenu = document.getElementById("btn-menu");
+  const feedbackForm = document.getElementById("feedback");
+  const feedbackMessageEl = document.getElementById("feedback-message");
+  const feedbackStateEl = document.getElementById("feedback-state");
+  const btnSendFeedback = document.getElementById("btn-send-feedback");
   const btnStart = document.getElementById("btn-start");
   const btnSettings = document.getElementById("btn-settings");
   const sfxOnBtn = document.getElementById("sfx-on");
@@ -612,8 +616,58 @@
 
     setTimeout(() => {
       showStanding();
-      document.getElementById("watch-actions").hidden = false;
+      showFeedbackForm();
     }, 2200);
+  }
+
+  /* ---------- feedback ---------- */
+
+  function showFeedbackForm() {
+    const nome = state.answers.name;
+    document.getElementById("feedback-title").textContent = nome
+      ? `O que você achou, ${nome}?`
+      : "O que você achou?";
+    feedbackForm.hidden = false;
+  }
+
+  function submitFeedback(event) {
+    event.preventDefault();
+
+    const escolhida = feedbackForm.querySelector('input[name="rating"]:checked');
+    if (!escolhida) {
+      feedbackStateEl.textContent = "Escolha de 1 a 5 estrelas.";
+      return;
+    }
+
+    btnSendFeedback.disabled = true;
+    feedbackStateEl.textContent = "Enviando…";
+
+    fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        playerName: state.answers.name || null,
+        rating: Number(escolhida.value),
+        message: feedbackMessageEl.value.trim() || null,
+        resultId: state.standing ? state.standing.id : null,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error(String(response.status));
+        return response.json();
+      })
+      .then(() => {
+        /* Some com o formulário: reenviar não faria sentido. */
+        feedbackForm.querySelector(".stars").hidden = true;
+        feedbackMessageEl.hidden = true;
+        btnSendFeedback.hidden = true;
+        document.getElementById("feedback-title").textContent = "Obrigado.";
+        feedbackStateEl.textContent = "Anotado.";
+      })
+      .catch(() => {
+        btnSendFeedback.disabled = false;
+        feedbackStateEl.textContent = "Não consegui enviar. Tente de novo.";
+      });
   }
 
   /* Placar só aparece depois que a frase final já assentou: número junto com o
@@ -653,22 +707,13 @@
   }
 
   function wirePortfolioLinks() {
-    if (PORTFOLIO.url) {
-      ["credit-link", "watch-credit"].forEach((id) => {
-        const el = document.getElementById(id);
-        el.href = PORTFOLIO.url;
-        el.textContent = PORTFOLIO.label;
-        el.hidden = false;
-      });
-    }
-
-    const feedbackUrl = FEEDBACK.url || PORTFOLIO.url;
-    if (feedbackUrl) {
-      const btn = document.getElementById("btn-feedback");
-      btn.href = feedbackUrl;
-      btn.textContent = FEEDBACK.label;
-      btn.hidden = false;
-    }
+    if (!PORTFOLIO.url) return;
+    ["credit-link", "watch-credit"].forEach((id) => {
+      const el = document.getElementById(id);
+      el.href = PORTFOLIO.url;
+      el.textContent = PORTFOLIO.label;
+      el.hidden = false;
+    });
   }
 
   function applyPlayedMark() {
@@ -748,7 +793,13 @@
   });
 
   buildProgressDots();
-  Effects.startGrain();
+  /* Atmosfera é enfeite: se falhar, não pode levar junto o resto da
+     inicialização, que é o que faz os botões existirem. */
+  try {
+    Effects.startGrain();
+  } catch (e) {
+    console.warn("granulado desativado:", e);
+  }
   applyPlayedMark();
   applySetupHint();
   wirePortfolioLinks();
@@ -759,4 +810,5 @@
     markPlayed();
     location.reload();
   });
+  feedbackForm.addEventListener("submit", submitFeedback);
 })();

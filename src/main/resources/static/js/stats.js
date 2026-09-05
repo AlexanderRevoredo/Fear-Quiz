@@ -89,6 +89,15 @@
     });
   }
 
+  /* Só o agregado: os comentários ficam no banco, não vão para a tela. */
+  function renderRating(resumo) {
+    if (!resumo || !resumo.total) return;
+    document.getElementById("stat-rating").textContent = `${resumo.averageRating} / 5`;
+    document.getElementById("stat-rating-label").textContent =
+      resumo.total === 1 ? "1 avaliação" : `${resumo.total} avaliações`;
+    document.getElementById("card-rating").hidden = false;
+  }
+
   function render(stats, ranking) {
     document.getElementById("stat-total").textContent = stats.totalPlayers;
     document.getElementById("stat-avg").textContent = stats.averageScore;
@@ -129,6 +138,11 @@
         return;
       }
       render(stats, ranking);
+      /* Falha em silêncio: sem avaliações, o cartão simplesmente não aparece. */
+      fetch("/api/feedback/summary")
+        .then((r) => (r.ok ? r.json() : null))
+        .then(renderRating)
+        .catch(() => {});
     })
     .catch(() => {
       stateEl.textContent =
