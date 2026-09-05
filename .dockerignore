@@ -1,0 +1,17 @@
+# Nunca mandar credencial para dentro da imagem.
+src/main/resources/application-local.properties
+config/
+.env
+.env.*
+
+# Nao precisa no build e so deixa o contexto pesado.
+target/
+.git/
+.github/
+.idea/
+.vscode/
+.mvn/
+mvnw
+mvnw.cmd
+*.iml
+*.md

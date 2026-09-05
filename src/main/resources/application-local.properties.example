@@ -14,8 +14,10 @@
 # Estes valores tem prioridade sobre os ${...} do application.properties, entao
 # com este arquivo voce nao precisa definir nenhuma variavel de ambiente.
 
-# Session pooler (IPv4). A conexao direta db.<ref>.supabase.co so tem registro
-# IPv6 e falha em redes sem IPv6.
-spring.datasource.url=jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require
-spring.datasource.username=postgres.ssglyxzqphnjlgmmrtdv
+# No Supabase, use o SESSION POOLER (IPv4). A conexao direta
+# db.<ref>.supabase.co so tem registro IPv6 e falha em redes sem IPv6.
+# Pegue a string em: Project Settings -> Database -> Connection string ->
+# aba "Session pooler". No pooler o usuario leva o ref do projeto junto.
+spring.datasource.url=jdbc:postgresql://aws-0-<REGIAO>.pooler.supabase.com:5432/postgres?sslmode=require
+spring.datasource.username=postgres.<REF-DO-PROJETO>
 spring.datasource.password=COLOQUE-A-SENHA-AQUI

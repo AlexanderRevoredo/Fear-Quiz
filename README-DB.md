@@ -37,7 +37,7 @@ opcionais:
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
-Para não depender disso, dá para fixar o perfil na *Run Configuration* do
+Para não depender das aspas, dá para fixar o perfil na *Run Configuration* do
 IntelliJ (`HorrorSiteApplication` → *Active profiles* → `local`) e rodar pelo
 botão de play.
 
@@ -45,15 +45,12 @@ O arquivo sem `.example` está no `.gitignore`, então fica só na sua máquina.
 Propriedades de perfil têm prioridade sobre o `application.properties`, então
 com esse arquivo você não precisa definir variável de ambiente nenhuma.
 
-No IntelliJ, dá para fixar isso na *Run Configuration* do
-`HorrorSiteApplication`, em *Active profiles* → `local`.
-
 ## Opção 2 — variáveis de ambiente
 
 PowerShell (a sessão atual apenas):
 
 ```powershell
-$env:FEARQUIZ_DB_URL="jdbc:postgresql://db.ssglyxzqphnjlgmmrtdv.supabase.co:5432/postgres?sslmode=require"
+$env:FEARQUIZ_DB_URL="jdbc:postgresql://db.<ref-do-projeto>.supabase.co:5432/postgres?sslmode=require"
 $env:FEARQUIZ_DB_USER="postgres"
 $env:FEARQUIZ_DB_PASSWORD="a-senha-real"
 ./mvnw spring-boot:run
@@ -62,7 +59,7 @@ $env:FEARQUIZ_DB_PASSWORD="a-senha-real"
 Git Bash:
 
 ```bash
-export FEARQUIZ_DB_URL="jdbc:postgresql://db.ssglyxzqphnjlgmmrtdv.supabase.co:5432/postgres?sslmode=require"
+export FEARQUIZ_DB_URL="jdbc:postgresql://db.<ref-do-projeto>.supabase.co:5432/postgres?sslmode=require"
 export FEARQUIZ_DB_USER="postgres"
 export FEARQUIZ_DB_PASSWORD="a-senha-real"
 ./mvnw spring-boot:run
@@ -97,6 +94,37 @@ parar de mudar sozinho a partir do código.
 | `POST` | `/api/results` | Salva a partida. Devolve id, faixa e o percentual de quem pontuou menos. |
 | `GET` | `/api/results/stats` | Total de partidas, média, distribuição por faixa e por medo. |
 | `GET` | `/api/results/ranking` | Top 10 por pontuação, desempatado por menor tempo. |
+
+## Deploy no Render
+
+O Render não tem Java na lista de linguagens, então o serviço usa **Docker** —
+o `Dockerfile` na raiz do projeto cuida disso.
+
+Configuração do *Web Service*:
+
+| Campo | Valor |
+| --- | --- |
+| Language | `Docker` |
+| Branch | `main` |
+| Root Directory | deixar vazio |
+
+Em *Environment*, defina as três variáveis:
+
+- `FEARQUIZ_DB_URL`
+- `FEARQUIZ_DB_USER`
+- `FEARQUIZ_DB_PASSWORD`
+
+**Não defina `PORT`** — o Render injeta essa variável sozinho, e o
+`application.properties` já a usa (`server.port=${PORT:8080}`).
+
+Duas características do plano gratuito que valem saber antes de mandar o link
+para alguém:
+
+- O serviço **hiberna após ~15 minutos sem acesso**, e o primeiro acesso
+  seguinte demora cerca de 50 segundos para responder. Quem não souber disso vai
+  achar que o site está fora do ar.
+- O Supabase gratuito **pausa o projeto após ~1 semana sem uso**, e aí o banco
+  para de responder até ser reativado no painel.
 
 ## Aviso sobre o ranking
 
