@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fear Quiz</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <canvas id="grain"></canvas>
+  <div id="vignette"></div>
+  <div id="flash"></div>
+  <div id="presence" title=""></div>
+  <div id="secret"></div>
+
+  <div id="audio-mini" hidden>
+    <button id="mini-mute" type="button" title="Silenciar">♪</button>
+    <input id="mini-volume" type="range" min="0" max="100" value="70" title="Volume" />
+  </div>
+
+  <main id="app">
+
+    <section id="screen-settings" class="screen active">
+      <h1 class="title">FEAR QUIZ</h1>
+      <p class="subtitle">Antes de começar.</p>
+
+      <div class="settings">
+        <div class="setting-row">
+          <span class="setting-label">Efeitos sonoros</span>
+          <div class="toggle">
+            <button id="sfx-on" class="toggle-btn active" type="button">Ativados</button>
+            <button id="sfx-off" class="toggle-btn" type="button">Desativados</button>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <span class="setting-label">Volume</span>
+          <input id="volume" class="slider" type="range" min="0" max="100" value="70" />
+        </div>
+      </div>
+
+      <p class="fine-print" id="setup-hint">Recomendamos fones de ouvido.</p>
+      <button id="btn-settings" class="btn">Continuar</button>
+      <p class="credit">
+        <a href="estatisticas.html">estatísticas</a>
+        <a id="credit-link" href="#" target="_blank" rel="noopener noreferrer" hidden></a>
+      </p>
+    </section>
+
+    <!-- Prólogo: desenho infantil que apodrece, e então corte para preto. -->
+    <section id="screen-prologue" class="screen">
+      <div id="paper">
+        <svg id="drawing" viewBox="0 0 400 300" aria-label="Um desenho infantil">
+          <g id="d-sun">
+            <circle cx="336" cy="58" r="21" />
+            <g id="d-rays">
+              <line x1="336" y1="26" x2="337" y2="12" />
+              <line x1="368" y1="58" x2="383" y2="57" />
+              <line x1="336" y1="90" x2="335" y2="104" />
+              <line x1="304" y1="58" x2="289" y2="59" />
+              <line x1="359" y1="35" x2="369" y2="24" />
+              <line x1="359" y1="81" x2="370" y2="91" />
+              <line x1="313" y1="81" x2="302" y2="92" />
+            </g>
+            <circle class="dot" cx="328" cy="52" r="2.2" />
+            <circle class="dot" cx="345" cy="52" r="2.2" />
+            <path id="d-sun-mouth" d="M326,65 Q336,73 347,64" />
+          </g>
+
+          <g id="d-house">
+            <path d="M118,192 L121,121 L201,118 L199,191 Z" />
+            <path d="M111,124 L160,87 L208,120" />
+            <path id="d-door" d="M147,191 L149,154 L168,153 L167,190" />
+            <path d="M130,139 L130,153 L146,152 L146,137 Z" />
+            <path id="d-window-right" d="M175,137 L175,152 L190,152 L190,136 Z" />
+          </g>
+
+          <g id="d-tree">
+            <path class="trunk" d="M256,193 L258,151" />
+            <path class="leaves" d="M258,152 Q228,148 234,124 Q236,104 258,106 Q282,102 285,124 Q291,149 258,152 Z" />
+          </g>
+
+          <!-- O "ser humano" que o autor desenhava quando criança. -->
+          <g id="d-figure">
+            <path class="head" d="M78,99 C84,99 89,103 89,109 C89,116 84,121 78,121 C71,121 67,116 67,109 C67,103 72,99 78,99 Z" />
+            <g class="hair">
+              <path d="M70,102 L66,95" />
+              <path d="M74,100 L72,92" />
+              <path d="M78,99 L79,91" />
+              <path d="M82,100 L85,92" />
+              <path d="M86,102 L90,96" />
+            </g>
+            <circle class="eye" cx="74" cy="108" r="1.3" />
+            <circle class="eye" cx="82" cy="108" r="1.3" />
+            <path class="face" d="M72,113 Q78,119 84,112" />
+            <path class="limb" d="M69,118 Q60,135 54,152" />
+            <path class="limb" d="M87,118 Q96,134 102,150" />
+            <path class="limb" d="M75,120 L74,193" />
+            <path class="limb" d="M83,120 L86,180" />
+          </g>
+
+          <line id="d-ground" x1="18" y1="193" x2="382" y2="191" />
+
+          <!-- Não estava aqui antes. É a mesma criatura, menor. -->
+          <g id="d-watcher">
+            <circle cx="182" cy="145" r="4.3" />
+            <path d="M178,142 L176,138" />
+            <path d="M181,141 L180,137" />
+            <path d="M184,141 L186,137" />
+            <path d="M187,143 L190,140" />
+            <circle class="eye" cx="180" cy="144" r="0.9" />
+            <circle class="eye" cx="184" cy="144" r="0.9" />
+          </g>
+
+          <path id="d-scribble" d="M60,120 L140,180 L90,190 L180,110 L120,100 L200,170 L70,160" />
+
+          <!-- O outro desenho do autor. Só aparece quando a imagem falha. -->
+          <g id="d-grin">
+            <path class="skull" d="M200,78 C232,77 262,100 264,138 C266,175 236,203 200,203 C163,203 135,176 136,138 C137,101 167,79 200,78 Z" />
+            <g class="hair">
+              <path d="M148,105 L124,88" />
+              <path d="M162,92 L150,68" />
+              <path d="M180,84 L173,60" />
+              <path d="M200,80 L200,56" />
+              <path d="M221,83 L230,59" />
+              <path d="M241,94 L256,74" />
+              <path d="M254,110 L278,98" />
+            </g>
+            <ellipse class="eye" cx="178" cy="124" rx="10" ry="12" />
+            <ellipse class="eye" cx="222" cy="124" rx="10" ry="12" />
+            <path class="nose" d="M201,138 L196,148 L204,148" />
+            <path class="lip" d="M158,150 Q200,138 244,152" />
+            <path class="lip" d="M158,150 Q200,192 244,152" />
+            <g class="teeth">
+              <path d="M170,147 L175,163 L181,148" />
+              <path d="M190,145 L195,161 L201,145" />
+              <path d="M210,145 L215,162 L221,147" />
+              <path d="M229,148 L234,163 L239,151" />
+              <path d="M181,175 L186,161 L191,177" />
+              <path d="M209,177 L214,162 L219,178" />
+            </g>
+          </g>
+        </svg>
+      </div>
+      <p id="paper-caption">minha casa</p>
+      <button id="btn-skip" class="skip-btn" type="button">pular</button>
+    </section>
+
+    <section id="screen-intro" class="screen">
+      <h1 class="title">BEM-VINDO AO<br />FEAR QUIZ</h1>
+      <p class="subtitle">Um pequeno questionário. Nada além disso.</p>
+      <p class="fine-print">Responda com sinceridade. Isso ajuda.</p>
+      <button id="btn-start" class="btn">Começar</button>
+    </section>
+
+    <section id="screen-quiz" class="screen">
+      <div id="progress" aria-hidden="true"></div>
+      <div id="question-card">
+        <p id="question-text"></p>
+        <div id="options"></div>
+      </div>
+    </section>
+
+    <!-- Falso final. -->
+    <section id="screen-fake-end" class="screen">
+      <h2 id="fake-title" class="title">OBRIGADO POR PARTICIPAR.</h2>
+      <p id="fake-text" class="end-text">Sua participação foi registrada.</p>
+      <button id="btn-exit" class="btn">SAIR</button>
+    </section>
+
+    <section id="screen-end" class="screen">
+      <h2 id="end-title" class="title"></h2>
+      <p id="end-profile" class="end-profile"></p>
+      <p id="end-text" class="end-text"></p>
+      <p id="end-standing" class="end-standing"></p>
+      <p id="end-disclaimer" class="fine-print"></p>
+      <button id="btn-continue-end" class="btn" hidden>Voltar ao início</button>
+    </section>
+
+    <!-- Última tela: só a frase, e o caminho de volta ao menu. -->
+    <section id="screen-watch" class="screen">
+      <p id="watch-text" class="watch-text"></p>
+      <p id="watch-score" class="watch-score"></p>
+      <div id="watch-actions" class="watch-actions" hidden>
+        <button id="btn-menu" class="btn">Voltar ao início</button>
+        <a id="btn-feedback" class="btn" href="#" target="_blank" rel="noopener noreferrer" hidden>Deixar feedback</a>
+      </div>
+      <p class="credit"><a id="watch-credit" href="#" target="_blank" rel="noopener noreferrer" hidden></a></p>
+    </section>
+
+  </main>
+
+  <script src="js/audio.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/prologue.js"></script>
+  <script src="js/secrets.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/quiz.js"></script>
+</body>
+</html>

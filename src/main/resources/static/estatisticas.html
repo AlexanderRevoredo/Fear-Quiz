@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fear Quiz — Estatísticas</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="stats-page">
+
+  <div id="vignette"></div>
+
+  <main id="stats">
+    <h1 class="title">ESTATÍSTICAS</h1>
+    <p class="subtitle">O que as pessoas responderam.</p>
+
+    <p id="stats-state" class="stats-state">Carregando…</p>
+
+    <div id="stats-body" hidden>
+      <div class="stat-row">
+        <div class="stat-card">
+          <span class="stat-number" id="stat-total">—</span>
+          <span class="stat-label">partidas</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="stat-avg">—</span>
+          <span class="stat-label">medo médio</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="stat-time">—</span>
+          <span class="stat-label">duração média</span>
+        </div>
+      </div>
+
+      <h2 class="stats-heading">Perfis</h2>
+      <div id="tier-bars" class="bars"></div>
+
+      <h2 class="stats-heading">O que mais incomoda</h2>
+      <div id="fear-bars" class="bars"></div>
+
+      <h2 class="stats-heading">Ranking</h2>
+      <div class="ranking-grid">
+        <div>
+          <h3 class="ranking-title">Mais assustados</h3>
+          <ol id="rank-fear" class="ranking"></ol>
+        </div>
+        <div>
+          <h3 class="ranking-title">Mais corajosos</h3>
+          <ol id="rank-brave" class="ranking"></ol>
+        </div>
+      </div>
+    </div>
+
+    <p class="stats-actions"><a href="/" class="btn">Voltar ao quiz</a></p>
+  </main>
+
+  <script src="js/questions.js"></script>
+  <script src="js/stats.js"></script>
+</body>
+</html>

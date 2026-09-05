@@ -1,0 +1,21 @@
+# COPIE este arquivo para "application-local.properties" (mesma pasta) e
+# preencha a senha real. O arquivo sem ".example" esta no .gitignore, entao a
+# senha fica so na sua maquina e nunca vai para o repositorio.
+#
+# ATENCAO: cole a senha SEM colchetes. O painel do Supabase mostra
+# [YOUR-PASSWORD] como marcador; os [ ] nao fazem parte da senha.
+#
+# Rodar no PowerShell (as aspas sao obrigatorias, senao ele parte o argumento
+# e o Maven reclama de "Unknown lifecycle phase"):
+#   ./mvnw spring-boot:run "-Dspring-boot.run.profiles=local"
+# Git Bash:
+#   ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+#
+# Estes valores tem prioridade sobre os ${...} do application.properties, entao
+# com este arquivo voce nao precisa definir nenhuma variavel de ambiente.
+
+# Session pooler (IPv4). A conexao direta db.<ref>.supabase.co so tem registro
+# IPv6 e falha em redes sem IPv6.
+spring.datasource.url=jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require
+spring.datasource.username=postgres.ssglyxzqphnjlgmmrtdv
+spring.datasource.password=COLOQUE-A-SENHA-AQUI
